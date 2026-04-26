@@ -1,0 +1,112 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Asfor API Task Management",
+    "version": "1.0.0",
+    "description": "API Task Management Organization untuk aplikasi Android dan Web."
+  },
+  "servers": [
+    {
+      "url": "http://localhost/api",
+      "description": "Local server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "summary": "User Login",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {"type": "string"},
+                  "password": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "Logged in successfully"}}
+      }
+    },
+    "/logout": {
+      "post": {
+        "summary": "User Logout",
+        "responses": {"200": {"description": "Logged out successfully"}}
+      }
+    },
+    "/profile": {
+      "get": {
+        "summary": "Get Profile Info",
+        "responses": {"200": {"description": "Profile data"}}
+      },
+      "put": {
+        "summary": "Update Profile",
+        "responses": {"200": {"description": "Profile saved"}}
+      }
+    },
+    "/profile/password": {
+      "put": {
+        "summary": "Change Password",
+        "responses": {"200": {"description": "Password updated"}}
+      }
+    },
+    "/users": {
+        "get": {"summary": "Get All Users (Admin)", "responses": {"200": {"description": "List users"}}},
+        "post": {"summary": "Create User (Admin)", "responses": {"201": {"description": "Created"}}}
+    },
+    "/users/{id}": {
+        "get": {"summary": "Get specific user", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "User"}}},
+        "put": {"summary": "Update User", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}},
+        "delete": {"summary": "Delete User", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Deleted"}}}
+    },
+    "/reports": {
+        "get": {"summary": "Get Reports","parameters": [{"name": "search", "in": "query", "schema": {"type": "string"}}, {"name": "status", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "List reports"}}},
+        "post": {"summary": "Create Report", "responses": {"201": {"description": "Created"}}}
+    },
+    "/reports/{id}": {
+        "get": {"summary": "Get static report", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Report"}}},
+        "put": {"summary": "Update Report", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}},
+        "delete": {"summary": "Delete Report", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Deleted"}}}
+    },
+    "/tasks": {
+        "get": {"summary": "Get Tasks", "parameters": [{"name": "status", "in": "query", "schema": {"type": "string"}}, {"name": "priority", "in": "query", "schema": {"type": "string"}}], "responses": {"200": {"description": "List tasks"}}},
+        "post": {"summary": "Create Task", "responses": {"201": {"description": "Created"}}}
+    },
+    "/tasks/{id}": {
+        "get": {"summary": "Get specific task", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Task"}}},
+        "put": {"summary": "Update task", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}},
+        "delete": {"summary": "Delete task", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Deleted"}}}
+    },
+    "/finances": {
+        "get": {"summary": "Get Finances (Admin/Bidang Usaha)", "responses": {"200": {"description": "List finances"}}},
+        "post": {"summary": "Create record", "responses": {"201": {"description": "Created"}}}
+    },
+    "/finances/summary": {
+        "get": {"summary": "Get Finance Summary percentages", "parameters": [{"name": "year", "in": "query", "schema": {"type": "integer"}}], "responses": {"200": {"description": "Returns HTML percentage mapping"}}}
+    },
+    "/finances/{id}": {
+        "get": {"summary": "Get specific finance", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Finance"}}},
+        "put": {"summary": "Update finance", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"200": {"description": "Updated"}}},
+        "delete": {"summary": "Delete finance", "parameters": [{"name": "id", "in": "path", "required": true, "schema": {"type": "integer"}}], "responses": {"204": {"description": "Deleted"}}}
+    }
+  }
+}
