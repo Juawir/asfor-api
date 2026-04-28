@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
+    use ApiResponse;
+
     private function filterByDivisionAccess($user, $task)
     {
         if (!$user->isAdmin() && $user->division !== $task->division) {
@@ -36,7 +39,7 @@ class TaskController extends Controller
             $query->where('division', $request->division);
         }
 
-        return response()->json($query->get());
+        return $this->successResponse($query->get(), 'Tasks retrieved successfully');
     }
 
     public function store(Request $request)
@@ -51,20 +54,20 @@ class TaskController extends Controller
         ]);
 
         if (!$request->user()->isAdmin() && $validated['division'] !== $request->user()->division) {
-            return response()->json(['message' => 'Anda hanya bisa membuat task untuk divisi Anda sendiri.'], 403);
+            return $this->errorResponse('Anda hanya bisa membuat task untuk divisi Anda sendiri.', 403);
         }
 
         $validated['assigned_by'] = $request->user()->id;
 
         $task = Task::create($validated);
 
-        return response()->json($task->load(['assignedTo', 'assignedBy']), 201);
+        return $this->successResponse($task->load(['assignedTo', 'assignedBy']), 'Task created successfully', 201);
     }
 
     public function show(Request $request, Task $task)
     {
         $this->filterByDivisionAccess($request->user(), $task);
-        return response()->json($task->load(['assignedTo', 'assignedBy']));
+        return $this->successResponse($task->load(['assignedTo', 'assignedBy']), 'Task retrieved successfully');
     }
 
     public function update(Request $request, Task $task)
@@ -81,12 +84,12 @@ class TaskController extends Controller
         ]);
 
         if (array_key_exists('division', $validated) && !$request->user()->isAdmin() && $validated['division'] !== $request->user()->division) {
-            return response()->json(['message' => 'Anda tidak bisa mengubah task ke divisi lain.'], 403);
+            return $this->errorResponse('Anda tidak bisa mengubah task ke divisi lain.', 403);
         }
 
         $task->update($validated);
 
-        return response()->json($task->load(['assignedTo', 'assignedBy']));
+        return $this->successResponse($task->load(['assignedTo', 'assignedBy']), 'Task updated successfully');
     }
 
     public function destroy(Request $request, Task $task)

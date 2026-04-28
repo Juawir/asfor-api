@@ -7,9 +7,12 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Traits;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
+
     public function login(Request $request)
     {
         $request->validate([
@@ -27,7 +30,7 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
+        $response_data = [
             'access_token' => $token,
             'token_type' => 'Bearer',
             'user' => [
@@ -37,15 +40,16 @@ class AuthController extends Controller
                 'role' => $user->role,
                 'division' => $user->division,
             ]
-        ]);
+        ];
+        return $this->successResponse(
+            $response_data, 'Login successfully'
+        );
     }
 
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        return $this->successResponse(null, 'Logged out successfully');
     }
 }

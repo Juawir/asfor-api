@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class ReportController extends Controller
 {
+    use ApiResponse;
+
     private function filterByDivisionAccess($user, $report)
     {
         if (!$user->isAdmin() && $user->division !== $report->division) {
@@ -33,7 +36,7 @@ class ReportController extends Controller
             $query->where('division', $request->division);
         }
 
-        return response()->json($query->get());
+        return $this->successResponse($query->get(), 'Reports retrieved successfully');
     }
 
     public function store(Request $request)
@@ -49,7 +52,7 @@ class ReportController extends Controller
         ]);
 
         if (!$request->user()->isAdmin() && $validated['division'] !== $request->user()->division) {
-            return response()->json(['message' => 'Anda hanya bisa membuat report untuk divisi Anda sendiri.'], 403);
+            return $this->errorResponse('Anda hanya bisa membuat report untuk divisi Anda sendiri.', 403);
         }
 
         if ($request->hasFile('attachment')) {
@@ -58,13 +61,13 @@ class ReportController extends Controller
 
         $report = Report::create($validated);
 
-        return response()->json($report, 201);
+        return $this->successResponse($report, 'Report created successfully', 201);
     }
 
     public function show(Request $request, Report $report)
     {
         $this->filterByDivisionAccess($request->user(), $report);
-        return response()->json($report);
+        return $this->successResponse($report, 'Report retrieved successfully');
     }
 
     public function update(Request $request, Report $report)
@@ -82,7 +85,7 @@ class ReportController extends Controller
         ]);
 
         if (array_key_exists('division', $validated) && !$request->user()->isAdmin() && $validated['division'] !== $request->user()->division) {
-            return response()->json(['message' => 'Anda tidak bisa mengubah ke divisi lain.'], 403);
+            return $this->errorResponse('Anda tidak bisa mengubah ke divisi lain.', 403);
         }
 
         if ($request->hasFile('attachment')) {
@@ -91,7 +94,7 @@ class ReportController extends Controller
 
         $report->update($validated);
 
-        return response()->json($report);
+        return $this->successResponse($report, 'Report updated successfully');
     }
 
     public function destroy(Request $request, Report $report)

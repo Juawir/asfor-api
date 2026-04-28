@@ -3,15 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
 {
+    use ApiResponse;
+
     public function show(Request $request)
     {
-        return response()->json($request->user());
+        return $this->successResponse($request->user(), 'Profile retrieved successfully');
     }
 
     public function update(Request $request)
@@ -25,7 +28,7 @@ class ProfileController extends Controller
 
         $user->update($validated);
 
-        return response()->json($user);
+        return $this->successResponse($user, 'Profile updated successfully');
     }
 
     public function changePassword(Request $request)
@@ -39,6 +42,6 @@ class ProfileController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        return response()->json(['message' => 'Password updated successfully.']);
+        return $this->successResponse(null, 'Password updated successfully');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,6 +11,8 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    use ApiResponse;
+
     private function authorizeAdmin($user)
     {
         if (!$user->isAdmin()) {
@@ -20,7 +23,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $this->authorizeAdmin($request->user());
-        return response()->json(User::all());
+        return $this->successResponse(User::all(), 'Users retrieved successfully');
     }
 
     public function store(Request $request)
@@ -39,18 +42,18 @@ class UserController extends Controller
 
         // Only default users need to join a division
         if ($validated['role'] === 'user' && empty($validated['division'])) {
-            return response()->json(['message' => 'Role user harus memiliki divisi.'], 422);
+            return $this->errorResponse('Role user harus memiliki divisi.', 422);
         }
 
         $user = User::create($validated);
 
-        return response()->json($user, 201);
+        return $this->successResponse($user, 'User created successfully', 201);
     }
 
     public function show(Request $request, User $user)
     {
         $this->authorizeAdmin($request->user());
-        return response()->json($user);
+        return $this->successResponse($user, 'User retrieved successfully');
     }
 
     public function update(Request $request, User $user)
@@ -73,12 +76,12 @@ class UserController extends Controller
         $division = array_key_exists('division', $validated) ? $validated['division'] : $user->division;
 
         if ($role === 'user' && empty($division)) {
-            return response()->json(['message' => 'Role user harus memiliki divisi.'], 422);
+            return $this->errorResponse('Role user harus memiliki divisi.', 422);
         }
 
         $user->update($validated);
 
-        return response()->json($user);
+        return $this->successResponse($user, 'User updated successfully');
     }
 
     public function destroy(Request $request, User $user)

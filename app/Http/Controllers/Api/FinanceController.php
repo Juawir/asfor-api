@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Traits\ApiResponse;
 use App\Models\Finance;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class FinanceController extends Controller
 {
+    use ApiResponse;
+
     private function authorizeFinanceAccess($user)
     {
         if (!$user->isAdmin() && $user->division !== 'Bidang Usaha') {
@@ -36,7 +39,7 @@ class FinanceController extends Controller
             $query->where('category', 'like', '%' . $request->category . '%');
         }
 
-        return response()->json($query->orderBy('date', 'desc')->get());
+        return $this->successResponse($query->orderBy('date', 'desc')->get(), 'Finances retrieved successfully');
     }
 
     public function store(Request $request)
@@ -54,13 +57,13 @@ class FinanceController extends Controller
 
         $finance = Finance::create($validated);
 
-        return response()->json($finance, 201);
+        return $this->successResponse($finance, 'Finance created successfully', 201);
     }
 
     public function show(Request $request, Finance $finance)
     {
         $this->authorizeFinanceAccess($request->user());
-        return response()->json($finance);
+        return $this->successResponse($finance, 'Finance retrieved successfully');
     }
 
     public function update(Request $request, Finance $finance)
@@ -78,7 +81,7 @@ class FinanceController extends Controller
 
         $finance->update($validated);
 
-        return response()->json($finance);
+        return $this->successResponse($finance, 'Finance updated successfully');
     }
 
     public function destroy(Request $request, Finance $finance)
@@ -112,7 +115,7 @@ class FinanceController extends Controller
             ->groupBy('category', 'type')
             ->get();
 
-        return response()->json([
+        return $this->successResponse([
             'year' => $year,
             'month' => $month,
             'summary' => [
@@ -127,6 +130,6 @@ class FinanceController extends Controller
                 'balance' => $totalIncome - $totalExpense
             ],
             'categories' => $categories
-        ]);
+        ], 'Finance summary retrieved successfully');
     }
 }
