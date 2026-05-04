@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\FinanceController;
+use App\Http\Controllers\Api\EventController;
+use App\Http\Controllers\Api\NotificationController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,6 +25,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Reports
     Route::apiResource('reports', ReportController::class);
+    Route::patch('reports/{report}/approve', [ReportController::class, 'approve']);
+    Route::patch('reports/{report}/reject', [ReportController::class, 'reject']);
 
     // Tasks
     Route::apiResource('tasks', TaskController::class);
@@ -36,4 +40,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('labs/{lab}/assign-pics', [\App\Http\Controllers\Api\LabController::class, 'assignPics']);
     Route::apiResource('labs', \App\Http\Controllers\Api\LabController::class)->only(['index', 'show']);
     Route::apiResource('labs.items', \App\Http\Controllers\Api\InventoryItemController::class)->only(['store', 'update', 'destroy']);
+
+    // Events
+    Route::apiResource('events', EventController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    // Notifications
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
 });

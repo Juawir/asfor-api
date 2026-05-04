@@ -13,16 +13,24 @@ class InventoryItemController extends Controller
 {
     use ApiResponse;
 
-    private function authorizeEdit($user)
+    private function authorizeEdit(Lab $lab, Request $request)
     {
-        if (!$user->isAdmin() && $user->division !== 'IT Support') {
-            abort(403, 'Unauthorized action. Only IT Support or Admin can edit inventory.');
+        $user = $request->user();
+        if ($user->isAdmin() || $user->division === 'IT Support') {
+            return;
         }
+
+        $isPic = $lab->pics()->where('users.id', $user->id)->exists();
+        if ($isPic) {
+            return;
+        }
+
+        abort(403, 'Unauthorized action. You must be IT Support or assigned to this lab to modify items.');
     }
 
     public function store(Request $request, Lab $lab)
     {
-        $this->authorizeEdit($request->user());
+        $this->authorizeEdit($lab, $request);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -38,7 +46,7 @@ class InventoryItemController extends Controller
 
     public function update(Request $request, Lab $lab, InventoryItem $item)
     {
-        $this->authorizeEdit($request->user());
+        $this->authorizeEdit($lab, $request);
 
         if ($item->lab_id !== $lab->id) {
             abort(404, 'Item not found in this lab.');
@@ -58,7 +66,7 @@ class InventoryItemController extends Controller
 
     public function destroy(Request $request, Lab $lab, InventoryItem $item)
     {
-        $this->authorizeEdit($request->user());
+        $this->authorizeEdit($lab, $request);
 
         if ($item->lab_id !== $lab->id) {
             abort(404, 'Item not found in this lab.');

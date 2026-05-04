@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Traits\ApiResponse;
 use App\Models\Lab;
 use App\Models\User;
+use App\Models\AppNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -82,6 +83,15 @@ class LabController extends Controller
                     'priority' => 'high',
                     'status' => 'pending'
                 ]);
+
+                // Notify assigned PIC
+                AppNotification::notify(
+                    $userId,
+                    'lab_assignment',
+                    '🔬 Penugasan Lab Baru',
+                    'Anda ditugaskan sebagai Penanggung Jawab di ' . $lab->name . '. Silakan mulai menginventaris barang.',
+                    ['lab_id' => $lab->id, 'lab_name' => $lab->name]
+                );
             }
         }
 
