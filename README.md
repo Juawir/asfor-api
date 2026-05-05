@@ -167,6 +167,48 @@ routes/
 
 ---
 
+---
+
+## 🚀 Deployment (Produksi)
+
+Untuk melakukan deployment ke server produksi (VPS atau Shared Hosting), ikuti panduan berikut:
+
+### 1. Persiapan Server
+- Pastikan PHP >= 8.2 dan ekstensi yang diperlukan (BCMath, Ctype, Fileinfo, JSON, Mbstring, OpenSSL, PDO, Tokenizer, XML) aktif.
+- Database MySQL/MariaDB sudah dibuat.
+
+### 2. Konfigurasi Environment
+- Salin `.env.production` menjadi `.env`.
+- Jalankan perintah:
+  ```bash
+  php artisan key:generate --force
+  ```
+- Sesuaikan `DB_DATABASE`, `DB_USERNAME`, dan `DB_PASSWORD`.
+- Atur `APP_DEBUG=false` dan `APP_URL` ke domain produksi Anda.
+
+### 3. Optimasi Produksi
+Jalankan perintah otomatis yang telah disiapkan:
+```bash
+composer deploy
+```
+Perintah ini akan melakukan:
+- Install dependencies tanpa package development.
+- Caching konfigurasi, route, dan view.
+- Menjalankan migrasi database secara otomatis.
+
+### 4. Folder Permissions
+Pastikan folder berikut memiliki izin tulis (writable):
+- `storage/`
+- `bootstrap/cache/`
+
+### 5. Symbolic Link
+Jika Anda menggunakan fitur upload file, buat symbolic link untuk folder storage:
+```bash
+php artisan storage:link
+```
+
+---
+
 ## 🤝 Kontribusi
 
 Kami menerima kontribusi dalam bentuk apapun!
