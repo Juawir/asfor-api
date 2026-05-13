@@ -53,28 +53,39 @@ class EventController extends Controller
             'division'   => ['required', Rule::in(['Semua', 'Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha'])],
         ]);
 
-        // Non-admin can only create events for their own division or 'Semua'
-        if (!$request->user()->isAdmin() && $validated['division'] !== 'Semua' && $validated['division'] !== $request->user()->division) {
-            return $this->errorResponse('Anda hanya bisa membuat kegiatan untuk divisi Anda sendiri.', 403);
+        // Non-admin can only create events for their own division
+        if (!$request->user()->isAdmin() && $validated['division'] !== $request->user()->division) {
+            return $this->errorResponse('Anda hanya bisa menambahkan kegiatan untuk divisi Anda sendiri.', 403);
         }
 
         $validated['created_by'] = $request->user()->id;
         $event = Event::create($validated);
         $event->load('creator:id,name,division');
 
-        // Notify relevant users about the new event
-        $divisionFilter = $event->division;
-        $usersToNotify = User::where('id', '!=', $request->user()->id)
-            ->when($divisionFilter !== 'Semua', fn($q) => $q->where('division', $divisionFilter))
-            ->pluck('id');
+        $creator   = $request->user();
+        $dateLabel = $event->event_date->format('d/m/Y');
+        $timeLabel = $event->event_time ? ' pukul ' . $event->event_time : '';
 
-        foreach ($usersToNotify as $uid) {
+        if ($event->division === 'Semua') {
+            // Kegiatan untuk semua → notify SEMUA user kecuali creator
+            $recipients = User::where('id', '!=', $creator->id)->pluck('id');
+        } else {
+            // Kegiatan divisi spesifik → notify anggota divisi + semua admin (kecuali creator)
+            $recipients = User::where('id', '!=', $creator->id)
+                ->where(function ($q) use ($event) {
+                    $q->where('division', $event->division)
+                      ->orWhere('role', 'admin');
+                })
+                ->pluck('id');
+        }
+
+        foreach ($recipients as $uid) {
             AppNotification::notify(
                 $uid,
                 'event',
                 '📅 Kegiatan Baru: ' . $event->title,
-                'Ada kegiatan baru pada ' . $event->event_date->format('d/m/Y') . '. Dibuat oleh ' . $request->user()->name,
-                ['event_id' => $event->id, 'event_date' => $event->event_date->format('Y-m-d')]
+                'Ada kegiatan baru' . ($event->division !== 'Semua' ? ' untuk divisi ' . $event->division : '') . ' pada ' . $dateLabel . $timeLabel . '. Dibuat oleh ' . $creator->name . '.',
+                ['event_id' => $event->id, 'event_date' => $event->event_date->format('Y-m-d'), 'division' => $event->division]
             );
         }
 

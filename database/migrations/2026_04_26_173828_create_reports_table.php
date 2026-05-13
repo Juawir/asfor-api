@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('division', ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha']);
+            $table->enum('division', ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha', 'Badan Pengurus Harian', 'Semua Divisi']);
             $table->date('date');
             $table->decimal('budget', 15, 2)->default(0);
             $table->text('description')->nullable();

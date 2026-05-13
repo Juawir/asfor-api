@@ -15,7 +15,7 @@ return new class extends Migration
             $table->date('event_date');
             $table->time('event_time')->nullable();
             $table->string('location')->nullable();
-            $table->enum('division', ['Semua', 'Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha'])->default('Semua');
+            $table->enum('division', ['Semua', 'Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha', 'Badan Pengurus Harian', 'Semua Divisi'])->default('Semua');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

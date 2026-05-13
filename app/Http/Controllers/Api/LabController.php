@@ -126,4 +126,18 @@ class LabController extends Controller
         $users = User::select('id', 'name', 'division', 'role')->get();
         return $this->successResponse($users, 'Users retrieved successfully');
     }
+    public function destroy(Request $request, Lab $lab)
+    {
+        $user = $request->user();
+        if (!$user->isAdmin() && $user->division !== 'IT Support') {
+            abort(403, 'Unauthorized action. Only IT Support or Admin can delete labs.');
+        }
+
+        // Hapus barang inventaris dan relasi PIC terlebih dahulu
+        $lab->inventoryItems()->delete();
+        $lab->pics()->detach();
+        $lab->delete();
+
+        return response()->json(null, 204);
+    }
 }

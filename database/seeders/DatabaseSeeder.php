@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'admin', 'password' => Hash::make('password'), 'role' => 'admin', 'division' => 'Semua Divisi'
         ]);
 
-        $divisions = ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha'];
+        $divisions = ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha', 'Badan Pengurus Harian'];
         $usersByDiv = [];
 
         $specificUsers = [
@@ -54,6 +54,9 @@ class DatabaseSeeder extends Seeder
             ['name' => 'ditta', 'email' => 'ditta@example.com', 'role' => 'user', 'division' => 'Hubungan Masyarakat'],
             ['name' => 'steven', 'email' => 'steven@example.com', 'role' => 'user', 'division' => 'Training'],
             ['name' => 'azizah', 'email' => 'azizah@example.com', 'role' => 'user', 'division' => 'Training'],
+            ['name' => 'bph1', 'email' => 'bph1@example.com', 'role' => 'admin', 'division' => 'Badan Pengurus Harian'],
+            ['name' => 'bph2', 'email' => 'bph2@example.com', 'role' => 'admin', 'division' => 'Badan Pengurus Harian'],
+            ['name' => 'bph3', 'email' => 'bph3@example.com', 'role' => 'admin', 'division' => 'Badan Pengurus Harian'],
         ];
 
         foreach ($specificUsers as $u) {
@@ -106,7 +109,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // 2. TASKS
-        $taskTitles = ['Perbaiki Jaringan Lab', 'Desain Poster Lomba', 'Setup Server Ujian', 'Pelatihan Anggota Baru', 'Audit Keuangan'];
+        $taskTitles = ['Perbaiki Jaringan Lab', 'Desain Poster Lomba', 'Setup Server Ujian', 'Pelatihan Anggota Baru', 'Audit Keuangan', 'Rapat Koordinasi BPH'];
         foreach ($divisions as $i => $division) {
             $assignee = $usersByDiv[$division][0];
             Task::create([
@@ -158,6 +161,7 @@ class DatabaseSeeder extends Seeder
             ['Maintenance Server Tahunan', 'IT Support', 'Ruang Server', $now->copy()->addDays(10)],
             ['Training Asisten Baru', 'Training', 'Lab Komputer B', $now->copy()->addDays(15)],
             ['Bazar Teknologi', 'Bidang Usaha', 'Halaman Kampus', $now->copy()->addDays(20)],
+            ['Rapat Kerja BPH', 'Badan Pengurus Harian', 'Ruang Rapat Utama', $now->copy()->addDays(7)],
         ];
 
         foreach ($eventsData as $event) {

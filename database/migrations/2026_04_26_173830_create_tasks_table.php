@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('assigned_to')->constrained('users')->onDelete('cascade');
             $table->foreignId('assigned_by')->constrained('users')->onDelete('cascade');
-            $table->enum('division', ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha']);
+            $table->enum('division', ['Hubungan Masyarakat', 'IT Support', 'Pemrograman', 'Training', 'Bidang Usaha', 'Badan Pengurus Harian', 'Semua Divisi']);
             $table->string('priority')->default('medium');
             $table->string('status')->default('pending');
             $table->timestamps();

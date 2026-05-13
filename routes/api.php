@@ -38,11 +38,18 @@ Route::middleware('auth:sanctum')->group(function () {
     // Labs & Inventory
     Route::get('inventory-users', [\App\Http\Controllers\Api\LabController::class, 'getInventoryUsers']);
     Route::post('labs/{lab}/assign-pics', [\App\Http\Controllers\Api\LabController::class, 'assignPics']);
-    Route::apiResource('labs', \App\Http\Controllers\Api\LabController::class)->only(['index', 'show', 'store']);
+    Route::apiResource('labs', \App\Http\Controllers\Api\LabController::class)->only(['index', 'show', 'store', 'destroy']);
     Route::apiResource('labs.items', \App\Http\Controllers\Api\InventoryItemController::class)->only(['store', 'update', 'destroy']);
 
     // Events
     Route::apiResource('events', EventController::class)->only(['index', 'store', 'update', 'destroy']);
+
+    // Elections
+    Route::get('elections/current', [\App\Http\Controllers\Api\ElectionController::class, 'current']);
+    Route::post('elections', [\App\Http\Controllers\Api\ElectionController::class, 'store']);
+    Route::post('elections/{id}/vote', [\App\Http\Controllers\Api\ElectionController::class, 'vote']);
+    Route::patch('elections/{id}/end', [\App\Http\Controllers\Api\ElectionController::class, 'end']);
+    Route::delete('elections/{id}', [\App\Http\Controllers\Api\ElectionController::class, 'destroy']);
 
     // Notifications
     Route::get('notifications', [NotificationController::class, 'index']);

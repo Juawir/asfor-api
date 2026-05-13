@@ -97,24 +97,22 @@ class TaskController extends Controller
             return $this->errorResponse('Anda tidak bisa mengubah task ke divisi lain.', 403);
         }
 
-        $oldStatus = $task->status;
+        $oldStatus     = $task->status;
+        $oldAssignedTo = $task->assigned_to;
         $task->update($validated);
         $task->load(['assignedTo', 'assignedBy']);
 
-        // Notify assigner when status changes
+        $actor = $request->user();
+
+        // Notif 1: Perubahan status → beritahu assigner (jika bukan diri sendiri)
         if (isset($validated['status']) && $validated['status'] !== $oldStatus) {
-            $actor = $request->user();
             $assignedById = $task->assigned_by;
-
             if ($assignedById && $assignedById !== $actor->id) {
-                $newStatus = $validated['status'];
-
-                $statusLabel = match($newStatus) {
+                $statusLabel = match($validated['status']) {
                     'done'       => '✅ Selesai',
                     'inProgress' => '🔄 Sedang Dikerjakan',
                     default      => '📋 Kembali ke To Do',
                 };
-
                 AppNotification::notify(
                     $assignedById,
                     'task_status',
@@ -123,17 +121,17 @@ class TaskController extends Controller
                     ['task_id' => $task->id]
                 );
             }
+        }
 
-            // Also notify assignee if task was re-assigned to them by someone else
-            if (isset($validated['assigned_to']) && $validated['assigned_to'] !== $actor->id) {
-                AppNotification::notify(
-                    $validated['assigned_to'],
-                    'task',
-                    '📋 Tugas Diperbarui',
-                    $actor->name . ' memperbarui tugas "' . $task->title . '" yang ditugaskan kepada Anda.',
-                    ['task_id' => $task->id]
-                );
-            }
+        // Notif 2: Reassignment → beritahu orang yang baru ditugaskan (jika berubah & bukan diri sendiri)
+        if (isset($validated['assigned_to']) && (int)$validated['assigned_to'] !== (int)$oldAssignedTo && (int)$validated['assigned_to'] !== $actor->id) {
+            AppNotification::notify(
+                $validated['assigned_to'],
+                'task',
+                '📋 Tugas Ditugaskan Ulang',
+                $actor->name . ' menugaskan tugas "' . $task->title . '" kepada Anda.',
+                ['task_id' => $task->id]
+            );
         }
 
         return $this->successResponse($task, 'Task updated successfully');
