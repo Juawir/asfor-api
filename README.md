@@ -28,6 +28,7 @@ RESTful API profesional untuk sistem manajemen **ASFOR (Asosiasi Forum)**. Dilen
 - 🛠️ **Manajemen Tugas** - Penugasan task antar anggota dengan tracking status & prioritas.
 - 📦 **Lab & Inventaris** - Pengelolaan barang di laboratorium dan penugasan PIC (Person In Charge).
 - 📅 **Manajemen Event** - Penjadwalan dan pengelolaan acara asosiasi.
+- 🗳️ **Pemilihan Ketua (Election)** - Pembuatan pemilihan, kandidat, dan real-time voting.
 - 💰 **Manajemen Keuangan** - Pencatatan pemasukan & pengeluaran dengan ringkasan otomatis.
 - 🔔 **Notifikasi Real-time** - Sistem pemberitahuan untuk setiap aktivitas penting.
 - 📖 **Dokumentasi Swagger** - Dokumentasi API interaktif yang mudah digunakan.
@@ -113,6 +114,15 @@ RESTful API profesional untuk sistem manajemen **ASFOR (Asosiasi Forum)**. Dilen
 | `GET` | `/api/labs/{id}` | Detail lab & daftar barang |
 | `POST` | `/api/labs/{id}/assign-pics` | Tugaskan PIC untuk Lab |
 | `POST` | `/api/labs/{id}/items` | Tambah barang ke inventaris |
+
+### 🗳️ Elections (Pemilihan Ketua)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/elections` | Lihat status pemilihan aktif |
+| `POST` | `/api/elections` | Buat pemilihan baru (Admin) |
+| `POST` | `/api/elections/{id}/vote` | Memberikan suara / voting |
+| `PATCH` | `/api/elections/{id}/end` | Akhiri pemilihan (Admin) |
+| `DELETE`| `/api/elections/{id}` | Hapus riwayat pemilihan (Admin) |
 
 ### 📅 Events & Notifications
 | Method | Endpoint | Description |
